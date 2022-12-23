@@ -2,35 +2,240 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latihan HTML</title>
+    <!-- Metadata -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
+    <!-- Judul pada tab browser -->
+    <title>Webgis Padukuhan Tembi</title>
+
+    <!-- Leaflet CSS Library -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+
+    <!-- Style untuk tampilan peta fullscreen -->
     <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            width: 100%;
+            margin: 0px;
+        }
 
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .info h2 {
+            margin: 0 0 5px;
+            color: #777;
+        }
     </style>
 </head>
 
 <body>
-<h1>Conversi derajat, menit, detik ke Decimal Degrees</h1>
+    <!-- Leaflet JavaScript Library -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
-<h5>Input DMS</h5>
-<label for="degree">Derajat :</label>
-<input type="number"> <br>
+    <!-- HTML Block untuk menampilkan peta -->
+    <div id="map"></div>
+    <script>
+        /* Initial Map */
+        var map = L.map('map').setView([-7.874222, 110.361480], 13); //lat, long, zoom
 
-<label for="minute">Menit :</label>
-<input type="number"> <br>
+        /* Tile Basemap */
+        var GoogleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: 'Google Satellite'
+        });
+        GoogleSatellite.addTo(map) //Memanggil basemap untuk ditampilkan ketika halaman dipanggil
 
-<label for="second">Detik :</label>
-<input type="number"> <br>
+        var GoogleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: 'Google Streets'
+        });
 
-<button>Ubah</button>
+        var GoogleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: 'Google Hybrid'
+        });
+        // awal layer peta
+        /* GeoJSON Polygon */
+        var admindesa = L.geoJson(null, {
+            /* Style polygon */
+            style: function (feature) { //Fungsi style polygon
+                return {
+                    fillColor: "#03fccf", //Warna tengah polygon
+                    fillOpacity: 0.2, //Transparansi tengah polygon
+                    color: "red", //Warna garis tepi polygon
+                    weight: 1, //Tebal garis tepi polygon
+                    opacity: 1, //Transparansi garis tepi polygon
+                };
+            },
+            /* Highlight & Popup */
+            onEachFeature: function (feature, layer) {
+                layer.on({
+                    mouseover: function (e) { //Fungsi ketika mouse berada di atas obyek
+                        //         var layer = e.target; //variabel layer
+                        //         layer.setStyle({ //Highlight style
+                        //             weight: 2, //Tebal garis tepi polygon
+                        //             color: "#00FFFF", //Warna garis tepi polygon
+                        //             opacity: 1, //Transparansi garis tepi polygon
+                        //             fillColor: "red", //Warna tengah polygon
+                        //             fillOpacity: 1, //Transparansi tengah polygon
+                        //         });
+                    },
+                    mouseout: function (e) { //Fungsi ketika mouse keluar dari area obyek
+                        //     admindesa.resetStyle(e.target); //Mengembalikan style polygon ke style awal
+                        //     map.closePopup(); //Menutup popup
+                    },
+                    click: function (e) { //Fungsi ketika obyek di-klik
+                        admindesa.bindPopup(feature.properties.KECAMATAN); //Popup
+                    }
+                });
+            }
+        });
+        /* memanggil data geojson polygon */
+        $.getJSON("timbulharjo.geojson", function (data) {
+            admindesa.addData(data);
+            map.addLayer(admindesa); //admindesa ditampilkan ketika halaman dipanggil
+            map.fitBounds(admindesa.getBounds());
+        });
 
-<script>
-// derajat + menit/60 +detik/3600
+        /* GeoJSON Polyline */
+        var jalanutama = L.geoJson(null, {
+            /* Style polyline */
+            style: function (feature) { //Fungsi style polyline
+                return {
+                    color: "yellow", //Warna garis
+                    weight: 2, //Tebal garis
+                    opacity: 1, //Transparansi garis
+                };
+            },
+            /* Highlight & Popup */
+            onEachFeature: function (feature, layer) {
+                layer.on({
+                    // mouseover: function (e) { //Fungsi ketika mouse berada di atas obyek
+                    //     var layer = e.target; //variabel layer
+                    //     layer.setStyle({ //Highlight style
+                    //         weight: 2,  //Tebal garis
+                    //         color: "#00FFFF", //Warna garis
+                    //         opacity: 1, //Transparansi garis
+                    //     });
+                    // },
+                    // mouseout: function (e) { //Fungsi ketika mouse keluar dari area obyek
+                    //     jalanutama.resetStyle(e.target); //Mengembalikan style garis ke style awal
+                    //     map.closePopup(); //Menutup popup
+                    // },
+                    click: function (e) { //Fungsi ketika obyek di-klik
+                        var content = "Keterangan: " + feature.properties.KETERANGAN + "<br>" +
+                            "Panjang: " + feature.properties.PANJANG_KM + " Km";
+                        jalanutama.bindPopup(content); //Popup
+                    }
+                });
+            }
+        });
+        /* memanggil data geojson polyline */
+        $.getJSON("jalan.geojson", function (data) {
+            jalanutama.addData(data);
+            map.addLayer(jalanutama); //jalanutama ditampilkan ketika halaman dipanggil
+        });
 
-</script>
+        /* GeoJSON Polyline */
+        var sungai = L.geoJson(null, {
+            /* Style polyline */
+            style: function (feature) { //Fungsi style polyline
+                return {
+                    color: "#428da6", //Warna garis
+                    weight: 4, //Tebal garis
+                    opacity: 1, //Transparansi garis
+                };
+            },
+            /* Highlight & Popup */
+            onEachFeature: function (feature, layer) {
+                layer.on({
+                    // mouseover: function (e) { //Fungsi ketika mouse berada di atas obyek
+                    //     var layer = e.target; //variabel layer
+                    //     layer.setStyle({ //Highlight style
+                    //         weight: 2,  //Tebal garis
+                    //         color: "#00FFFF", //Warna garis
+                    //         opacity: 1, //Transparansi garis
+                    //     });
+                    // },
+                    // mouseout: function (e) { //Fungsi ketika mouse keluar dari area obyek
+                    //     sungai.resetStyle(e.target); //Mengembalikan style garis ke style awal
+                    //     map.closePopup(); //Menutup popup
+                    // },
+                    click: function (e) { //Fungsi ketika obyek di-klik
+                        var content = "Keterangan: " + feature.properties.KETERANGAN + "<br>" +
+                            "Panjang: " + feature.properties.PANJANG_KM + " Km";
+                        sungai.bindPopup(content); //Popup
+                    }
+                });
+            }
+        });
+        /* memanggil data geojson polyline */
+        $.getJSON("sungai.geojson", function (data) {
+            sungai.addData(data);
+            map.addLayer(sungai); //sungai ditampilkan ketika halaman dipanggil
+        });
+
+        //akhir layer peta
+        var baseMaps = { //list basemap
+            'Google Satellite': GoogleSatellite,
+            'Google Streets': GoogleStreets,
+            'Google Hybrid': GoogleHybrid,
+        };
+        var Layers = {  //list layer
+            'Jalan Utama': jalanutama,
+            'Admin Desa': admindesa,
+            'Sungai': sungai
+
+        };
+        var layerControl = L.control.layers(baseMaps, Layers, { collapsed: false });
+
+
+        var title = new L.Control();
+        title.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+        title.update = function () {
+            this._div.innerHTML = '<h2>Peta Administrasi</h2>Kelurahan Timbulharjo, Kapanewon Sewon, Kabupaten Bantul'
+        };
+        title.addTo(map);
+        layerControl.addTo(map);
+
+        L.Control.Watermark = L.Control.extend({
+            onAdd: function (map) {
+                var img = L.DomUtil.create('img');
+                img.src = 'https://itny.ac.id/wp-content/uploads/2019/03/logo-itny21.png'; //Image URL
+                img.style.width = '350px'; //Image Size
+                return img;
+            },
+            onRemove: function (map) {
+                // Nothing to do here
+            }
+        });
+        L.control.watermark = function (opts) {
+            return new L.Control.Watermark(opts);
+        }
+        L.control.watermark({ position: 'bottomleft' }).addTo(map);
+
+        map.attributionControl.setPrefix("Hidayati Khoiru Ulinuha");
+    </script>
 </body>
 
 </html>
