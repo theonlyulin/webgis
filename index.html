@@ -191,6 +191,40 @@
             map.addLayer(sungai); //sungai ditampilkan ketika halaman dipanggil
         });
 
+        /* GeoJSON Point */
+        var wisata = L.geoJson(null, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {
+                    icon: L.icon({
+                        iconUrl: "https://cdn-icons-png.flaticon.com/512/6554/6554183.png", //icon simbol
+                        iconSize: [28, 28], //ukuran icon simbol
+                        iconAnchor: [14, 28], //penempatan icon simbol
+                        popupAnchor: [0, -28], //penempatan popup terhadap icon simbol
+                    })
+                });
+            },
+            /* Popup */
+            onEachFeature: function (feature, layer) {
+                if (feature.properties) {
+                    /* Variabel untuk memanggil atribut dari data geojson */
+                    var content = "Nama : <b>" + feature.properties.Nama + "</b><br>" +
+                        "Alamat : <b>" + feature.properties.Alamat + "</b><br>" +
+                        "Rating : <b>" + feature.properties.Rating + "</b><br>" +
+                        "Jenis : <b>" + feature.properties.Jenis + "</b><br>" +
+                        layer.on({
+                            click: function (e) { //Fungsi ketika icon simbol di-klik
+                                wisata.bindPopup(content);
+                            }
+                        });
+                }
+            }
+        });
+        /* memanggil data geojson point */
+        $.getJSON("wisata.geojson", function (data) {
+            wisata.addData(data);
+            map.addLayer(wisata); //wisata ditampilkan ketika halaman dipanggil
+        });
+
         //akhir layer peta
         var baseMaps = { //list basemap
             'Google Satellite': GoogleSatellite,
@@ -200,8 +234,8 @@
         var Layers = {  //list layer
             'Jalan Utama': jalanutama,
             'Admin Desa': admindesa,
-            'Sungai': sungai
-
+            'Sungai': sungai,
+            'Tempat Wisata': wisata
         };
         var layerControl = L.control.layers(baseMaps, Layers, { collapsed: false });
 
@@ -222,7 +256,7 @@
             onAdd: function (map) {
                 var img = L.DomUtil.create('img');
                 img.src = 'https://itny.ac.id/wp-content/uploads/2019/03/logo-itny21.png'; //Image URL
-                img.style.width = '350px'; //Image Size
+                img.style.width = '170px'; //Image Size
                 return img;
             },
             onRemove: function (map) {

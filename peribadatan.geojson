@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "peribadatan",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Nama": "Masjid Al- Dzikro", "Rating": 4.6, "Review": 159, "Jenis": "Masjid", "Alamat": "49MF+4Q6, Jl. Imogiri Barat", "Kabupaten/Kota": "Bantul", "Full Address": "Masjid Al- Dzikro Masjid Bantul ", "Latitude": -7.8672202, "Longitude": 110.3743756 }, "geometry": { "type": "Point", "coordinates": [ 110.3743756, -7.8672202 ] } },
+{ "type": "Feature", "properties": { "Nama": "Masjid Al Falaah", "Rating": 4.7, "Review": 102, "Jenis": "Masjid", "Alamat": "Jl. Parangtritis No.Km 12,5", "Kabupaten/Kota": "Bantul", "Full Address": "Masjid Al Falaah Masjid Bantul ", "Latitude": -7.8864241, "Longitude": 110.3453945 }, "geometry": { "type": "Point", "coordinates": [ 110.3453945, -7.8864241 ] } }
+]
+}
